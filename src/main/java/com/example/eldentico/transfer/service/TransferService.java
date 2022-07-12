@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -36,7 +38,6 @@ public class TransferService {
         } else {
             return mapDtoList(transferRepository.findAll());
         }
-
     }
 
     public TransferResponseDto findTransferById(Long id) {
@@ -44,21 +45,16 @@ public class TransferService {
         return mapDto(transferRepository.getById(id));
     }
 
-    public TransferEntity createTransfer(TransferRequestDto transferRequestDto) throws TransferException {
+    public TransferEntity createTransfer(TransferRequestDto transferRequestDto){
+        LocalDate localDateNow = LocalDate.now();
+        LocalTime localTimeNow = LocalTime.now();
         if (transferRequestDto.getAmount() == 0) {
             throw new TransferException(ExceptionInfo.AMOUNT_WAS_PROVIDED_AS_ZERO.name(), HttpStatus.BAD_REQUEST);
         }
-        UserEntity transferOwner = userRepository.findById(transferRequestDto.getUserId()).orElseThrow();
-        TransferEntity transfer = mapEntity(transferRequestDto, transferOwner);
+        UserEntity transferOwner = userRepository.getById(transferRequestDto.getUserId());
+        TransferEntity transfer = mapEntity(transferRequestDto, transferOwner,localDateNow,localTimeNow);
         transferRepository.save(transfer);
         log.info("Create transfer finished.");
-        String userName = transferOwner.getFirstName() +" "+transferOwner.getLastName();
-        try {
-            wordService.createWord(transferRequestDto,userName,transferOwner.getLastName());
-        } catch (Exception e){
-            System.out.println("ERROR while creating the world file.");
-        }
-
         return transfer;
     }
 
@@ -82,11 +78,13 @@ public class TransferService {
         // return ResponseEntity.noContent().build();
     }
 
-    private TransferEntity mapEntity(TransferRequestDto transferRequestDto, UserEntity userEntity) {
+    private TransferEntity mapEntity(TransferRequestDto transferRequestDto, UserEntity userEntity, LocalDate localDate,LocalTime localTime) {
         return TransferEntity.builder()
                 .amount(transferRequestDto.getAmount())
                 .name(transferRequestDto.getName())
                 .userEntity(userEntity)
+                .localDate(localDate)
+                .localTime(localTime)
                 .build();
     }
 

@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Builder
 @Entity
@@ -21,6 +23,8 @@ public class TransferEntity {
     private String name;
     @Column(scale = 4)
     private long amount;
+    private LocalDate localDate;
+    private LocalTime localTime;
 
     @JsonIgnore
     @ManyToOne
