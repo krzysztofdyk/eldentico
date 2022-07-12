@@ -52,9 +52,9 @@ public class TransferService {
         TransferEntity transfer = mapEntity(transferRequestDto, transferOwner);
         transferRepository.save(transfer);
         log.info("Create transfer finished.");
-
+        String userName = transferOwner.getFirstName() +" "+transferOwner.getLastName();
         try {
-            wordService.createWord(transferRequestDto);
+            wordService.createWord(transferRequestDto,userName,transferOwner.getLastName());
         } catch (Exception e){
             System.out.println("ERROR while creating the world file.");
         }
