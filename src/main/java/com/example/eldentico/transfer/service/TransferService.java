@@ -8,6 +8,7 @@ import com.example.eldentico.transfer.exception.TransferException;
 import com.example.eldentico.transfer.repository.TransferRepository;
 import com.example.eldentico.user.entity.UserEntity;
 import com.example.eldentico.user.repository.UserRepository;
+import com.example.eldentico.word.WordService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ public class TransferService {
 
     private final TransferRepository transferRepository;
     private final UserRepository userRepository;
+    private final WordService wordService;
 
 
     public List<TransferResponseDto> findAllTransfers(String name) {
@@ -50,6 +52,13 @@ public class TransferService {
         TransferEntity transfer = mapEntity(transferRequestDto, transferOwner);
         transferRepository.save(transfer);
         log.info("Create transfer finished.");
+
+        try {
+            wordService.createWord(transferRequestDto);
+        } catch (Exception e){
+            System.out.println("ERROR while creating the world file.");
+        }
+
         return transfer;
     }
 
@@ -73,7 +82,7 @@ public class TransferService {
         // return ResponseEntity.noContent().build();
     }
 
-    public TransferEntity mapEntity(TransferRequestDto transferRequestDto, UserEntity userEntity) {
+    private TransferEntity mapEntity(TransferRequestDto transferRequestDto, UserEntity userEntity) {
         return TransferEntity.builder()
                 .amount(transferRequestDto.getAmount())
                 .name(transferRequestDto.getName())
@@ -117,6 +126,9 @@ public class TransferService {
     public boolean hasTransferFilledName (TransferEntity transferEntity){
         return Optional.ofNullable(transferEntity.getName()).isEmpty();
     }
+
+
+
 
 
 }

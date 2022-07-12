@@ -24,8 +24,6 @@ public class UserEntity {
     private String lastName;
     private String city;
 
-    @OneToMany
-    @JoinColumn(name = "user_entity_id")
+    @OneToMany(mappedBy = "userEntity")
     private List<TransferEntity> transferList;
-
 }

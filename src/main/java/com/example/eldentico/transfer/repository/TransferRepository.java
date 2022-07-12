@@ -13,7 +13,7 @@ public interface TransferRepository extends JpaRepository<TransferEntity,Long> {
     List<TransferEntity> findByName (String name);
     List<TransferEntity> findAllByUserEntityIdIn (List<Long> userEntityId);
 
-    /*@Query(value =
+/*    @Query(value =
             "SELECT DISTINCT name" +
             "FROM TransferEntity" , nativeQuery = true )
     List<String> find();*/
